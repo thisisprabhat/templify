@@ -44,6 +44,8 @@ templify has three commands
 ## Template creation guide
 
 > templateDefaultName = `testModule`
+ 
+ ✍️ We recommend to use atleast 4-5 leters templateDefaultName
 1. Naming files
     * test_module_model.dart
     * test_module_controller.dart
@@ -58,14 +60,14 @@ templify has three commands
     * test-module
 
 4. Structure folder structure
-    * root folder should have name of the template
+    * root folder should have name of the template (any prefered name)
     * Inside the root folder we should have all the folders and files
 5. In the root template directory we can have a file named `name.txt` and inside it we can have name of the template which will be overridden from global `templateDefaultName`<br>
     > name.txt
     ```
     testModule
     ```
-6. You may also add `instructions.md` file to be printed after module creation
+7. You may also add `instructions.md` file to be printed after module creation
     > instructions.md
     ```
     ## Copy TestRepo().init() to main() file

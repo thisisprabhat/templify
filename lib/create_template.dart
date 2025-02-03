@@ -1,17 +1,33 @@
 import 'dart:io';
 
 import 'package:colored_log/colored_log.dart';
+
+import '/commands/commands.dart';
+import '/model/config.dart';
+import 'docs/docs.dart';
 import 'utils/string_extension.dart';
 
 class CreateTemplate {
-  String _moduleName = '';
-  String _defaultName = 'banana';
-  String _templateDirectoryPath = 'templates';
-  String _destinationDirectoryPath = 'destination';
+  CreateTemplate({String? moduleName, String? destinationDir}) {
+    if (destinationDir != null) _destinationDirectoryPath = destinationDir;
+    if (moduleName != null) _moduleName = moduleName;
 
+    ColoredLog.yellow(_destinationDirectoryPath, name: 'Destination Directory');
+  }
+
+  String _moduleName = '';
+  String? _defaultName;
+  String get defaultName => _defaultName ?? '';
+  String _templateDirectoryPath = '${Directory.current.path}/templates';
+  String _destinationDirectoryPath = '';
+
+  Directory _templateRootDirectory =
+      Directory('${Directory.current.path}/templates');
+
+  Directory get templateDirectory => Directory(_templateDirectoryPath);
   set setTemplateDirectory(String path) {
     ColoredLog.yellow(path, name: 'Template Directory');
-    _templateDirectory = Directory(path);
+    _templateDirectoryPath = path;
   }
 
   set setDestinationDirectory(String path) {
@@ -20,18 +36,16 @@ class CreateTemplate {
   }
 
   String get moduleName => _moduleName;
-  set setModuleName(String name) {
-    _moduleName = name;
-  }
-
-  Directory _templateDirectory = Directory.current;
-
-  Directory get templateDirectory => _templateDirectory;
+  set setModuleName(String name) => _moduleName = name;
 
   Future operation() async {
     try {
+      final templateRootPath = await Commands.getTemplateDirectoryPath();
+      _templateRootDirectory = Directory(templateRootPath);
+
       await getModuleName();
       await getTemplateDirectory();
+      await getDefaultModuleName();
       ColoredLog.magenta(templateDirectory, name: 'Source Directory');
       ColoredLog.magenta(Directory.current, name: 'Destination Directory');
       final destinationDirectory =
@@ -45,7 +59,7 @@ class CreateTemplate {
       ColoredLog.magenta(destinationDirectory, name: 'Destination Directory');
       await copyDirectory(templateDirectory, destinationDirectory);
     } catch (e) {
-      ColoredLog.red(e, name: 'Error');
+      ColoredLog.red(e, name: 'Error creating template');
     }
   }
 
@@ -56,7 +70,7 @@ class CreateTemplate {
       name: 'Instruction',
     );
     ColoredLog.magenta(
-      'Module Name :  "$_defaultName module" or "$_defaultName"',
+      'Module Name :  "$defaultName module" or "$defaultName"',
       name: 'Eg',
     );
     print('\n');
@@ -78,29 +92,29 @@ class CreateTemplate {
   }) async {
     String fileContents = await file.readAsString();
     fileContents = fileContents.replaceAll(
-      _defaultName.toCamelCase,
+      defaultName.toCamelCase,
       moduleName.toCamelCase,
     );
     fileContents = fileContents.replaceAll(
-      _defaultName.toTitleCase,
+      defaultName.toTitleCase,
       moduleName.toTitleCase,
     );
 
     fileContents = fileContents.replaceAll(
-      _defaultName.toUpperCase(),
+      defaultName.toUpperCase(),
       moduleName.toUpperCase(),
     );
     fileContents = fileContents.replaceAll(
-      _defaultName.toKebabCase,
+      defaultName.toKebabCase,
       moduleName.toKebabCase,
     );
     fileContents = fileContents.replaceAll(
-      _defaultName.toSnakeCase,
+      defaultName.toSnakeCase,
       moduleName.toSnakeCase,
     );
 
     fileContents = fileContents.replaceAll(
-      _defaultName.toLowerCase(),
+      defaultName.toLowerCase(),
       moduleName.toLowerCase(),
     );
 
@@ -135,7 +149,7 @@ class CreateTemplate {
           ColoredLog.blue(entity.path, name: 'File');
           String fileName = entity.uri.pathSegments.last;
           fileName = fileName.replaceAll(
-            _defaultName.toSnakeCase,
+            defaultName.toSnakeCase,
             moduleName.toSnakeCase,
           );
           var newFile = File('${destination.path}/$fileName');
@@ -163,10 +177,8 @@ class CreateTemplate {
 
   getTemplateDirectory() async {
     List<Directory> directories = [];
-    final runnerDir = runnerDirectory();
-    Directory templateDirectory = Directory('${runnerDir.path}/templates');
     await for (FileSystemEntity entity
-        in templateDirectory.list(recursive: false, followLinks: false)) {
+        in _templateRootDirectory.list(recursive: false, followLinks: false)) {
       if (entity is Directory) directories.add(entity);
     }
     print('\n');
@@ -176,6 +188,19 @@ class CreateTemplate {
         directories[i].path.split('/').last,
         name: i.toString(),
       );
+    }
+    // If no template found in the template directory then print the below message
+    // and open the template directory
+    if (directories.isEmpty) {
+      ColoredLog.red(
+        'No template found in the template directory',
+        name: 'Error',
+        style: LogStyle.blinkSlow,
+      );
+      Docs.printTemplateCreationLogic();
+      await Future.delayed(Duration(seconds: 1));
+      Commands.openDirectory(templateDirectory.path);
+      exit(0);
     }
 
     ColoredLog.white('Enter Index :');
@@ -201,17 +226,24 @@ class CreateTemplate {
     );
     ColoredLog.green(
       templateDirectory.path,
-      name: 'Selected Template',
+      name: 'Selected Template Path',
     );
     print('\n');
   }
 
-  Directory runnerDirectory() {
-    Uri scriptUri = Platform.script;
-    String scriptPath = scriptUri.toFilePath();
-    String scriptDirectory = File(scriptPath).parent.path;
-    Directory runnerDirectory = Directory(scriptDirectory);
-    // ColoredLog.yellow(runnerDirectory.path, name: 'Script Directory');
-    return runnerDirectory;
+  Future<void> getDefaultModuleName() async {
+    final nameDirectoryPath = '${templateDirectory.path}/name.txt';
+    if (await Directory(nameDirectoryPath).exists()) {
+      final nameFile = File(nameDirectoryPath);
+      if (await nameFile.exists()) {
+        final name = await nameFile.readAsString();
+        if (name.isNotEmpty) {
+          _defaultName = name.trim();
+          return;
+        }
+      }
+      final config = await Config.fromFile();
+      _defaultName = config.defaultModuleName;
+    }
   }
 }
