@@ -65,7 +65,7 @@ templify has three commands
     ```
     testModule
     ```
-5. You may also add `instructions.md` file to be printed after module creation
+6. You may also add `instructions.md` file to be printed after module creation
     > instructions.md
     ```
     ## Copy TestRepo().init() to main() file

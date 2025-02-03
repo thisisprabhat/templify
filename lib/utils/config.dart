@@ -21,5 +21,6 @@ Map<String, dynamic> loadSettingsFromFile(String filePath) {
 
 void saveSettingsToFile(Map<String, dynamic> data, String filePath) {
   String yamlString = jsonEncode(data);
+
   io.File(filePath).writeAsStringSync(yamlString);
 }
