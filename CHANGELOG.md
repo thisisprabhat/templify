@@ -1,4 +1,4 @@
-## 0.8.1
+## 0.8.2
 
 - Version print issue fixed
 - `config.json` changed to `templify_config.json`
