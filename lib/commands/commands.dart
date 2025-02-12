@@ -122,11 +122,11 @@ class Commands {
         );
         final path = stdin.readLineSync();
 
-        if (path != null) {
-          String actualPath = path.replaceAll('\'', '');
+        if ((path ?? '').isNotEmpty) {
+          String actualPath = path!.replaceAll('\'', '');
           actualPath = actualPath.replaceAll('"', '');
           final temPath = Directory(actualPath);
-          temPath.create(recursive: true);
+          await temPath.create(recursive: true);
           dir = temPath;
           await Config.save(templatePath: temPath.path);
           templatePath = temPath.path;

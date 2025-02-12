@@ -140,31 +140,9 @@ class CreateTemplate {
     required String newPath,
   }) async {
     String fileContents = await file.readAsString();
-    fileContents = fileContents.replaceAll(
+    fileContents = fileContents.replaceCaseWith(
       defaultName.toCamelCase,
       moduleName.toCamelCase,
-    );
-    fileContents = fileContents.replaceAll(
-      defaultName.toTitleCase,
-      moduleName.toTitleCase,
-    );
-
-    fileContents = fileContents.replaceAll(
-      defaultName.toUpperCase(),
-      moduleName.toUpperCase(),
-    );
-    fileContents = fileContents.replaceAll(
-      defaultName.toKebabCase,
-      moduleName.toKebabCase,
-    );
-    fileContents = fileContents.replaceAll(
-      defaultName.toSnakeCase,
-      moduleName.toSnakeCase,
-    );
-
-    fileContents = fileContents.replaceAll(
-      defaultName.toLowerCase(),
-      moduleName.toLowerCase(),
     );
 
     final newFile = File(newPath);
@@ -185,23 +163,23 @@ class CreateTemplate {
         print('Directory already exists.');
       }
 
-      ColoredLog.cyan(await destination.exists(), name: 'Destination_exists');
-
       await for (FileSystemEntity entity in source.list(recursive: false)) {
         if (entity.path.split('/').last.startsWith('.')) continue;
         if (entity is Directory) {
-          String newPath = '${destination.path}/${entity.path.split('/').last}';
+          String directoryName = entity.path.split('/').last;
+          String newPath = '${destination.path}/$directoryName';
           ColoredLog.yellow(entity.path, name: 'New Directory');
 
           await copyDirectory(entity, Directory(newPath));
         } else if (entity is File) {
           ColoredLog.blue(entity.path, name: 'File');
           String fileName = entity.uri.pathSegments.last;
-          fileName = fileName.replaceAll(
+          fileName = fileName.replaceCaseWith(
             defaultName.toSnakeCase,
             moduleName.toSnakeCase,
           );
-          var newFile = File('${destination.path}/$fileName');
+
+          File newFile = File('${destination.path}/$fileName');
           await individualFileOperations(file: entity, newPath: newFile.path);
         }
       }

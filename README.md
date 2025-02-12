@@ -4,6 +4,35 @@ A cli app built using dart, that creates a module or sub module from a template.
 - It speeds up the development eliminating to copy paste similar modules or portion of code over and over again
 - We can templify similar controllers or ui part in our code and enjoy
 
+## Installation
+Run the following command to activate `templify` globally.
+```
+dart pub global activate templify
+```
+
+## Using
+- First configure `template path` and `defaultTemplateName` using the following command
+```console
+templify config -d "Path to template directory"
+```
+or
+```console
+templify config --dir "Path to template directory"
+```
+- Add templates in the directory, we may run
+```console
+templify open
+```
+to open the template folder in file explorer
+- Now you may use `templify` using the following command to create copy of the template
+```
+templify create
+```
+or we add path and name along with create command as
+```
+templify create --name exampleName --path "destination directory path"
+```
+
 ## List of commands
 templify has three commands
 - base command
@@ -19,12 +48,13 @@ templify has three commands
 
 -t, --template     It shows instructions to create template module.
 
+open               To open template folder
+
 ```
 
 
 ### templify config
 ```
-
 -d, --dir    The path to the directory where the template will be stored.
 
 -n, --name         Name of the template module.
@@ -34,7 +64,6 @@ templify has three commands
 
 ### templify create 
 ```
-
 -n, --name         Name of the module to be created.
 
 -p, --path         Path to the directory where the module will be created.
@@ -106,3 +135,28 @@ templateName
     └── test_screen.dart
 ```
 
+> Created `Employee module` out of above template
+
+```ts
+employee
+├── components
+│   ├── employee_card.dart
+│   ├── employee_details_info_page.dart
+│   ├── employee_details_side.dart
+│   └── employee_mobile_view.dart
+├── controllers
+│   ├── add_update_employee_provider.dart
+│   └── employee_details_provider.dart
+├── data
+│   ├── dummy_employee_data.dart
+│   ├── models
+│   │   └── employee_model.dart
+│   └── repositories
+│       ├── employee_dummy_repo.dart
+│       └── employee_remote_repo.dart
+├── name.txt
+└── views
+    ├── add_update_employee.dart
+    ├── employee_details.dart
+    └── employee_screen.dart
+```

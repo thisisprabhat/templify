@@ -288,4 +288,38 @@ extension StringExtensions on String {
         DateFormat('MMM dd, yyyy').tryParse(input) ?? // Example: March 15, 2024
         DateFormat('MMMM dd, yyyy').tryParse(input); // Example: March 15, 2024
   }
+
+  String replaceCaseWith(String oldValue, String newValue) {
+    String fileContents = replaceAll(
+      oldValue.toCamelCase,
+      newValue.toCamelCase,
+    );
+
+    fileContents = fileContents.replaceAll(
+      oldValue.toTitleCase,
+      newValue.toTitleCase,
+    );
+
+    fileContents = fileContents.replaceAll(
+      oldValue.toUpperCase(),
+      newValue.toUpperCase(),
+    );
+
+    fileContents = fileContents.replaceAll(
+      oldValue.toKebabCase,
+      newValue.toKebabCase,
+    );
+
+    fileContents = fileContents.replaceAll(
+      oldValue.toSnakeCase,
+      newValue.toSnakeCase,
+    );
+
+    fileContents = fileContents.replaceAll(
+      oldValue.toLowerCase(),
+      newValue.toLowerCase(),
+    );
+
+    return fileContents;
+  }
 }
