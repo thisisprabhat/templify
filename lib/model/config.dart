@@ -53,7 +53,7 @@ class Config {
 
   static Future<void> reset() async {
     final dir = Directory.systemTemp;
-    final file = File('${dir.path}/config.json');
+    final file = File('${dir.path}/templify_config.json');
 
     file.delete(recursive: true);
     ColoredLog.green('Config reset successfully');
@@ -61,7 +61,7 @@ class Config {
 
   static Future<void> save({String? defaultName, String? templatePath}) async {
     final dir = Directory.systemTemp;
-    final file = File('${dir.path}/config.json');
+    final file = File('${dir.path}/templify_config.json');
     final config = await fromFile();
     final newConfig = config.copyWith(
       templatePath: templatePath,

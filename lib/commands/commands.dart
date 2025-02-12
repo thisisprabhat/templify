@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:colored_log/colored_log.dart';
 
-import 'package:yaml/yaml.dart';
 import 'package:args/args.dart';
 
 import 'package:templify/docs/docs.dart';
 import 'package:templify/model/config.dart';
 
 import '../create_template.dart';
+
+final _version = '0.8.2';
 
 class Commands {
   static handleCommands({
@@ -167,11 +168,7 @@ class Commands {
   }
 
   static showVersion() {
-    String filePath = Platform.script.path;
-    filePath = filePath.replaceAll('bin/templify.dart', 'pubspec.yaml');
-    final fileString = File(filePath).readAsStringSync();
-    var doc = loadYaml(fileString);
-    ColoredLog.yellow(doc['version'], name: 'Version');
+    ColoredLog.yellow(_version, name: 'Version');
   }
 
   static openDirectory(String? path) async {
