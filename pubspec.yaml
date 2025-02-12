@@ -2,7 +2,8 @@ name: templify
 description: A dart command-line app to create modules or sub-modules using predefined templates.
 repository: https://github.com/thisisprabhat/templify.git
 homepage: https://github.com/thisisprabhat/templify.git
-version: 0.8.0
+
+version: 0.8.1
 
 environment:
   sdk: ^3.6.1
@@ -26,8 +27,13 @@ topics:
 
 platforms:
   linux:
+  android:
+  ios:
   macos:
   web:
   windows:
 
+executables:
+  templify:
+  
 license: MIT

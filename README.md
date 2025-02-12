@@ -6,7 +6,7 @@ A cli app built using dart, that creates a module or sub module from a template.
 
 ## Installation
 Run the following command to activate `templify` globally.
-```
+```console
 dart pub global activate templify
 ```
 
@@ -54,7 +54,7 @@ open               To open template folder
 
 
 ### templify config
-```
+```console
 -d, --dir    The path to the directory where the template will be stored.
 
 -n, --name         Name of the template module.
@@ -63,7 +63,7 @@ open               To open template folder
 
 
 ### templify create 
-```
+```console
 -n, --name         Name of the module to be created.
 
 -p, --path         Path to the directory where the module will be created.
@@ -129,6 +129,7 @@ templateName
 │   └── repositories
 │       ├── test_dummy_repo.dart
 │       └── test_remote_repo.dart
+├── name.txt
 └── views
     ├── add_update_test.dart
     ├── test_details.dart
@@ -154,7 +155,6 @@ employee
 │   └── repositories
 │       ├── employee_dummy_repo.dart
 │       └── employee_remote_repo.dart
-├── name.txt
 └── views
     ├── add_update_employee.dart
     ├── employee_details.dart
