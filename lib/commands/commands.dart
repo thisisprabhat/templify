@@ -100,49 +100,54 @@ class Commands {
     );
   }
 
-  static Future<String> getTemplateDirectoryPath() async {
+  static Future<String?> getTemplateDirectoryPath() async {
     final Config config = await Config.fromFile();
-    final path = config.templatePath;
+    String? templatePath = config.templatePath;
     Directory dir = Directory('${Directory.current.path}/templates');
-    if (path == null) {
-      if (await dir.exists()) {
-        await Config.save(templatePath: dir.path);
+    if (templatePath == null) {
+      ColoredLog.yellow(
+        'No template folder found! Do you want to create template folder in the working directory (y/N):',
+        name: 'Input',
+      );
+      final input = stdin.readLineSync();
+      if ((input ?? '') == 'y' ||
+          (input ?? '') == 'Y' ||
+          (input ?? '') == 'yes') {
+        await dir.create(recursive: true);
+        ColoredLog.green(dir.path, name: 'Directory created');
       } else {
-        ColoredLog.yellow(
-          'No template folder found! Do you want to create template folder in the working directory (y/N):',
+        ColoredLog.white(
+          'Enter the path of the template directory where you will store all your templates :',
           name: 'Input',
         );
-        final input = stdin.readLineSync();
-        if ((input ?? '') == 'y' ||
-            (input ?? '') == 'Y' ||
-            (input ?? '') == 'yes') {
-          await dir.create(recursive: true);
-          ColoredLog.green(dir.path, name: 'Directory created');
+        final path = stdin.readLineSync();
+
+        if (path != null) {
+          String actualPath = path.replaceAll('\'', '');
+          actualPath = actualPath.replaceAll('"', '');
+          final temPath = Directory(actualPath);
+          temPath.create(recursive: true);
+          dir = temPath;
+          await Config.save(templatePath: temPath.path);
+          templatePath = temPath.path;
         } else {
-          ColoredLog.white(
-            'Enter the path of the template directory where you will store all your templates :',
-            name: 'Input',
+          ColoredLog.red('Invalid input', name: 'Error');
+          ColoredLog.yellow(
+            'To update the template directory use the below command',
           );
-          final path = stdin.readLineSync();
-          if (path != null) {
-            final temPath = Directory('path');
-            temPath.create(recursive: true);
-            dir = temPath;
-            await Config.save(templatePath: temPath.path);
-          } else {
-            ColoredLog.red('Invalid input', name: 'Error');
-            ColoredLog.yellow(
-              'To update the template directory use the below command',
-            );
-            ColoredLog('⚪️ templify config -d "TEMPLATE DIRECTORY"');
-            ColoredLog('⚪️ templify config --dir "TEMPLATE DIRECTORY"');
-            print('');
-            exit(0);
-          }
+          ColoredLog('⚪️ templify config -d "TEMPLATE DIRECTORY"');
+          ColoredLog('⚪️ templify config --dir "TEMPLATE DIRECTORY"');
+          print('');
+          exit(0);
         }
       }
     }
-    return path ?? dir.path;
+
+    if (templatePath == null) {
+      exit(0);
+    } else {
+      return templatePath;
+    }
   }
 
   static help({

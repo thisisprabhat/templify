@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:colored_log/colored_log.dart';
 
-import '/commands/commands.dart';
-import '/model/config.dart';
 import 'docs/docs.dart';
+import '/model/config.dart';
+import '/commands/commands.dart';
 import 'utils/string_extension.dart';
 
 class CreateTemplate {
@@ -12,12 +12,18 @@ class CreateTemplate {
     if (destinationDir != null) _destinationDirectoryPath = destinationDir;
     if (moduleName != null) _moduleName = moduleName;
 
-    ColoredLog.yellow(_destinationDirectoryPath, name: 'Destination Directory');
+    if (moduleName != null) ColoredLog.magenta(moduleName, name: moduleName);
+    if (destinationDir != null) {
+      ColoredLog.yellow(
+        _destinationDirectoryPath,
+        name: 'Destination Directory',
+      );
+    }
   }
 
   String _moduleName = '';
   String? _defaultName;
-  String get defaultName => _defaultName ?? '';
+  String get defaultName => _defaultName ?? 'orange';
   String _templateDirectoryPath = '${Directory.current.path}/templates';
   String _destinationDirectoryPath = '';
 
@@ -41,15 +47,20 @@ class CreateTemplate {
   Future operation() async {
     try {
       final templateRootPath = await Commands.getTemplateDirectoryPath();
-      _templateRootDirectory = Directory(templateRootPath);
+      _templateRootDirectory = Directory(templateRootPath!);
 
       await getModuleName();
+      await getDestinationDirectory();
       await getTemplateDirectory();
       await getDefaultModuleName();
       ColoredLog.magenta(templateDirectory, name: 'Source Directory');
-      ColoredLog.magenta(Directory.current, name: 'Destination Directory');
+      ColoredLog.magenta(
+        _destinationDirectoryPath,
+        name: 'Destination Directory',
+      );
+      ColoredLog.magenta(defaultName, name: 'Default Module Name');
       final destinationDirectory =
-          Directory('${Directory.current.path}/${moduleName.toCamelCase}');
+          Directory('$_destinationDirectoryPath/${moduleName.toCamelCase}');
       if (!await destinationDirectory.exists()) {
         await destinationDirectory.create(recursive: true);
         ColoredLog.green('Directory created: ${destinationDirectory.path}');
@@ -65,6 +76,7 @@ class CreateTemplate {
 
   getModuleName() async {
     print('\n');
+    if (_moduleName.isNotEmpty) return;
     ColoredLog.magenta(
       'Module name should be in format smaller case with space',
       name: 'Instruction',
@@ -79,10 +91,47 @@ class CreateTemplate {
     if ((input ?? '').isNotEmpty) {
       setModuleName = input!;
     } else {
-      ColoredLog.red('invalid input', name: 'Error');
+      ColoredLog.red(
+        'invalid input',
+        name: 'Error',
+        style: LogStyle.blinkSlow,
+      );
       exit(0);
     }
     ColoredLog.green(moduleName, name: 'Module Name');
+    print('\n');
+  }
+
+  getDestinationDirectory() async {
+    if (_destinationDirectoryPath.isNotEmpty) return;
+    print('\n');
+    ColoredLog.magenta(
+      'Enter Destination Directory where module will be created',
+      name: 'Instruction',
+    );
+    ColoredLog.magenta(
+      'Directory Path :  "User/username/Projects/flutter/auth"',
+      name: 'Eg',
+    );
+    print('\n');
+    ColoredLog.white('Enter Directory path:', name: 'Input');
+    final input = stdin.readLineSync();
+    if ((input ?? '').isNotEmpty) {
+      String path = input!.replaceAll('\'', '');
+      path = path.replaceAll('"', '');
+      _destinationDirectoryPath = path;
+    } else {
+      ColoredLog.red(
+        'invalid input',
+        name: 'Error',
+        style: LogStyle.blinkSlow,
+      );
+      exit(0);
+    }
+    ColoredLog.green(
+      _destinationDirectoryPath,
+      name: 'Destination Directory Path',
+    );
     print('\n');
   }
 
@@ -139,12 +188,12 @@ class CreateTemplate {
       ColoredLog.cyan(await destination.exists(), name: 'Destination_exists');
 
       await for (FileSystemEntity entity in source.list(recursive: false)) {
+        if (entity.path.split('/').last.startsWith('.')) continue;
         if (entity is Directory) {
-          var newDirectory =
-              Directory('${destination.path}/${entity.path.split('/').last}');
+          String newPath = '${destination.path}/${entity.path.split('/').last}';
           ColoredLog.yellow(entity.path, name: 'New Directory');
 
-          await copyDirectory(entity, newDirectory);
+          await copyDirectory(entity, Directory(newPath));
         } else if (entity is File) {
           ColoredLog.blue(entity.path, name: 'File');
           String fileName = entity.uri.pathSegments.last;
@@ -176,74 +225,86 @@ class CreateTemplate {
   }
 
   getTemplateDirectory() async {
-    List<Directory> directories = [];
-    await for (FileSystemEntity entity
-        in _templateRootDirectory.list(recursive: false, followLinks: false)) {
-      if (entity is Directory) directories.add(entity);
-    }
-    print('\n');
-    ColoredLog.white('Select template index from below options');
-    for (int i = 0; i < directories.length; i++) {
-      ColoredLog.green(
-        directories[i].path.split('/').last,
-        name: i.toString(),
-      );
-    }
-    // If no template found in the template directory then print the below message
-    // and open the template directory
-    if (directories.isEmpty) {
-      ColoredLog.red(
-        'No template found in the template directory',
-        name: 'Error',
-        style: LogStyle.blinkSlow,
-      );
-      Docs.printTemplateCreationLogic();
-      await Future.delayed(Duration(seconds: 1));
-      Commands.openDirectory(templateDirectory.path);
-      exit(0);
-    }
-
-    ColoredLog.white('Enter Index :');
-    final input = stdin.readLineSync();
-    if ((input ?? '').isNotEmpty) {
-      final availableOptions = List.generate(directories.length, (i) => i);
-
-      if (availableOptions.contains(int.tryParse(input!))) {
-        final dir = directories[int.tryParse(input.toString()) ?? 0];
-        setTemplateDirectory = dir.path;
-      } else {
-        ColoredLog.red('invalid input', name: 'Error');
+    try {
+      List<Directory> directories = [];
+      await for (FileSystemEntity entity in _templateRootDirectory.list(
+          recursive: false, followLinks: false)) {
+        if (entity is Directory) directories.add(entity);
+      }
+      print('\n');
+      ColoredLog.white('Select template index from below options');
+      for (int i = 0; i < directories.length; i++) {
+        ColoredLog.green(
+          directories[i].path.split('/').last,
+          name: i.toString(),
+        );
+      }
+      // If no template found in the template directory then print the below message
+      // and open the template directory
+      if (directories.isEmpty) {
+        ColoredLog.red(
+          'No template found in the template directory',
+          name: 'Error',
+          style: LogStyle.blinkSlow,
+        );
+        Docs.printTemplateCreationLogic();
+        await Future.delayed(Duration(seconds: 1));
+        Commands.openDirectory(templateDirectory.path);
         exit(0);
       }
-    } else {
-      ColoredLog.red('invalid input', name: 'Error');
-      exit(0);
-    }
 
-    ColoredLog.green(
-      templateDirectory.path.split('/').last,
-      name: 'Selected Template',
-    );
-    ColoredLog.green(
-      templateDirectory.path,
-      name: 'Selected Template Path',
-    );
-    print('\n');
+      ColoredLog.white('Enter Index :');
+      final input = stdin.readLineSync();
+      if ((input ?? '').isNotEmpty) {
+        final availableOptions = List.generate(directories.length, (i) => i);
+
+        if (availableOptions.contains(int.tryParse(input!))) {
+          final dir = directories[int.tryParse(input.toString()) ?? 0];
+          setTemplateDirectory = dir.path;
+        } else {
+          ColoredLog.red(
+            'invalid input',
+            name: 'Error',
+            style: LogStyle.blinkSlow,
+          );
+          exit(0);
+        }
+      } else {
+        ColoredLog.red(
+          'invalid input',
+          name: 'Error',
+          style: LogStyle.blinkSlow,
+        );
+        exit(0);
+      }
+
+      ColoredLog.green(
+        templateDirectory.path.split('/').last,
+        name: 'Selected Template',
+      );
+      ColoredLog.green(
+        templateDirectory.path,
+        name: 'Selected Template Path',
+      );
+      print('\n');
+    } catch (e) {
+      Docs.printTemplateCreationLogic();
+    }
   }
 
   Future<void> getDefaultModuleName() async {
     final nameDirectoryPath = '${templateDirectory.path}/name.txt';
-    if (await Directory(nameDirectoryPath).exists()) {
+    final exists = await File(Directory(nameDirectoryPath).path).exists();
+    if (exists) {
       final nameFile = File(nameDirectoryPath);
-      if (await nameFile.exists()) {
-        final name = await nameFile.readAsString();
-        if (name.isNotEmpty) {
-          _defaultName = name.trim();
-          return;
-        }
+
+      final name = await nameFile.readAsString();
+      if (name.isNotEmpty) {
+        _defaultName = name.trim();
+        return;
       }
-      final config = await Config.fromFile();
-      _defaultName = config.defaultModuleName;
     }
+    final config = await Config.fromFile();
+    _defaultName = config.defaultModuleName;
   }
 }

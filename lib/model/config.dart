@@ -33,15 +33,20 @@ class Config {
     final file = File('${dir.path}/config.json');
     if (await file.exists()) {
       final content = await file.readAsString();
-      return Config.fromJson(content);
+      final config = Config.fromJson(content);
+      if (await File(config.templatePath ?? '').exists()) {
+        return config;
+      } else {
+        return config.copyWith(templatePath: null);
+      }
     } else {
-      file.createSync();
       final config = Config(
         templatePath: null,
         defaultModuleName: 'test',
       );
-      file.createSync(recursive: true);
-      file.writeAsStringSync(config.toJson());
+
+      await file.create(recursive: true);
+      await file.writeAsString(config.toJson());
       return config;
     }
   }
@@ -49,6 +54,7 @@ class Config {
   static Future<void> reset() async {
     final dir = Directory.systemTemp;
     final file = File('${dir.path}/config.json');
+
     file.delete(recursive: true);
     ColoredLog.green('Config reset successfully');
   }
