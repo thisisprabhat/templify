@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:colored_log/colored_log.dart';
+import 'package:templify/utils/print_helper.dart';
 
 import 'docs/docs.dart';
 import '/model/config.dart';
 import '/commands/commands.dart';
 import 'utils/string_extension.dart';
+
+String get platformPathSaperator => Platform.pathSeparator;
 
 class CreateTemplate {
   CreateTemplate({String? moduleName, String? destinationDir}) {
@@ -24,11 +27,12 @@ class CreateTemplate {
   String _moduleName = '';
   String? _defaultName;
   String get defaultName => _defaultName ?? 'orange';
-  String _templateDirectoryPath = '${Directory.current.path}/templates';
+  String _templateDirectoryPath =
+      '${Directory.current.path}${platformPathSaperator}templates';
   String _destinationDirectoryPath = '';
 
   Directory _templateRootDirectory =
-      Directory('${Directory.current.path}/templates');
+      Directory('${Directory.current.path}${platformPathSaperator}templates');
 
   Directory get templateDirectory => Directory(_templateDirectoryPath);
   set setTemplateDirectory(String path) {
@@ -59,8 +63,8 @@ class CreateTemplate {
         name: 'Destination Directory',
       );
       ColoredLog.magenta(defaultName, name: 'Default Module Name');
-      final destinationDirectory =
-          Directory('$_destinationDirectoryPath/${moduleName.toCamelCase}');
+      final destinationDirectory = Directory(
+          '$_destinationDirectoryPath$platformPathSaperator${moduleName.toCamelCase}');
       if (!await destinationDirectory.exists()) {
         await destinationDirectory.create(recursive: true);
         ColoredLog.green('Directory created: ${destinationDirectory.path}');
@@ -68,7 +72,15 @@ class CreateTemplate {
         ColoredLog.cyan('Directory already exists.');
       }
       ColoredLog.magenta(destinationDirectory, name: 'Destination Directory');
-      await copyDirectory(templateDirectory, destinationDirectory);
+      await copyDirectory(
+        source: templateDirectory,
+        destination: destinationDirectory,
+        isMainDest: true,
+      );
+      printDirectoryTree(destinationDirectory, '', true);
+      print('\n\n');
+      ColoredLog.green('Successfully Created', name: '✅');
+      await printInstructions(templateDirectory);
     } catch (e) {
       ColoredLog.red(e, name: 'Error creating template');
     }
@@ -110,7 +122,7 @@ class CreateTemplate {
       name: 'Instruction',
     );
     ColoredLog.magenta(
-      'Directory Path :  "User/username/Projects/flutter/auth"',
+      'Directory Path :  "User${platformPathSaperator}username${platformPathSaperator}Projects${platformPathSaperator}flutter${platformPathSaperator}auth"',
       name: 'Eg',
     );
     print('\n');
@@ -151,10 +163,14 @@ class CreateTemplate {
       flush: true,
       mode: FileMode.writeOnly,
     );
-    ColoredLog.white(newFile.path, name: 'Created');
+    ColoredLog.white('${newFile.path}\n', name: 'Created');
   }
 
-  Future<void> copyDirectory(Directory source, Directory destination) async {
+  Future<void> copyDirectory({
+    required Directory source,
+    required Directory destination,
+    bool? isMainDest,
+  }) async {
     try {
       if (!await destination.exists()) {
         await destination.create(recursive: true);
@@ -164,22 +180,28 @@ class CreateTemplate {
       }
 
       await for (FileSystemEntity entity in source.list(recursive: false)) {
-        if (entity.path.split('/').last.startsWith('.')) continue;
+        if (entity.path.split(platformPathSaperator).last.startsWith('.')) {
+          continue;
+        }
         if (entity is Directory) {
-          String directoryName = entity.path.split('/').last;
-          String newPath = '${destination.path}/$directoryName';
+          String directoryName = entity.path.split(platformPathSaperator).last;
+          String newPath =
+              '${destination.path}$platformPathSaperator$directoryName';
           ColoredLog.yellow(entity.path, name: 'New Directory');
 
-          await copyDirectory(entity, Directory(newPath));
+          await copyDirectory(source: entity, destination: Directory(newPath));
         } else if (entity is File) {
           ColoredLog.blue(entity.path, name: 'File');
           String fileName = entity.uri.pathSegments.last;
+          if (fileName.containsAvoidableFiles) continue;
+
           fileName = fileName.replaceCaseWith(
             defaultName.toSnakeCase,
             moduleName.toSnakeCase,
           );
 
-          File newFile = File('${destination.path}/$fileName');
+          File newFile =
+              File('${destination.path}$platformPathSaperator$fileName');
           await individualFileOperations(file: entity, newPath: newFile.path);
         }
       }
@@ -213,7 +235,7 @@ class CreateTemplate {
       ColoredLog.white('Select template index from below options');
       for (int i = 0; i < directories.length; i++) {
         ColoredLog.green(
-          directories[i].path.split('/').last,
+          directories[i].path.split(platformPathSaperator).last,
           name: i.toString(),
         );
       }
@@ -257,7 +279,7 @@ class CreateTemplate {
       }
 
       ColoredLog.green(
-        templateDirectory.path.split('/').last,
+        templateDirectory.path.split(platformPathSaperator).last,
         name: 'Selected Template',
       );
       ColoredLog.green(
@@ -271,7 +293,8 @@ class CreateTemplate {
   }
 
   Future<void> getDefaultModuleName() async {
-    final nameDirectoryPath = '${templateDirectory.path}/name.txt';
+    final nameDirectoryPath =
+        '${templateDirectory.path}${platformPathSaperator}name.txt';
     final exists = await File(Directory(nameDirectoryPath).path).exists();
     if (exists) {
       final nameFile = File(nameDirectoryPath);

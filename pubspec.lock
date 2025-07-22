@@ -66,10 +66,10 @@ packages:
     dependency: "direct main"
     description:
       name: colored_log
-      sha256: "70c5ecf53dde481c3549be8a1e3c11da176227752bef8783b8a4ebc1c4913a8a"
+      sha256: "0d601d5a19dff66d41f09cd0aaccadb8d504e6c177056f68018e8adc91c9e0e5"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.4.0"
   convert:
     dependency: transitive
     description:
@@ -94,6 +94,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.6"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: "253a18bbd4851fecba42f7343a1df3a9a4c1d31a2c1b37e221086b4fa8c8dbc9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.8.0+1"
+  dio_web_adapter:
+    dependency: transitive
+    description:
+      name: dio_web_adapter
+      sha256: "7586e476d70caecaf1686d21eee7247ea43ef5c345eab9e0cc3583ff13378d78"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   file:
     dependency: transitive
     description:
@@ -223,7 +239,7 @@ packages:
     source: hosted
     version: "2.1.1"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"

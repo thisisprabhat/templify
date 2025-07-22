@@ -60,6 +60,26 @@ $error
     ColoredLog.green(configParser.usage);
     ColoredLog.yellow('\ntemplify create');
     ColoredLog.green(createParser.usage);
+    ColoredLog.yellow('\ntemplify open');
+    ColoredLog.green('Opens the template directory in file explorer');
+    ColoredLog.yellow('\ntemplify reset');
+    ColoredLog.green('Resets the config to default');
+
     print('');
+  }
+
+  static printTitle() {
+    String title = '''
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              ╔╦╗┌─┐┌┬┐┌─┐┬  ┬┌─┐┬ ┬
+               ║ ├┤ │││├─┘│  │├┤ └┬┘
+               ╩ └─┘┴ ┴┴  ┴─┘┴└   ┴ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ ''';
+    print(ColoredLog.getStylizedText(
+      title,
+      style: LogStyle.bold,
+      color: LogColor.green,
+    ));
   }
 }

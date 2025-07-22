@@ -322,4 +322,9 @@ extension StringExtensions on String {
 
     return fileContents;
   }
+
+  bool get containsAvoidableFiles {
+    final avoidableFiles = ['name.txt', 'instructions.md', 'config.yaml'];
+    return avoidableFiles.contains(this);
+  }
 }

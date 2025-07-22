@@ -3,7 +3,7 @@ description: A dart command-line app to create modules or sub-modules using pred
 repository: https://github.com/thisisprabhat/templify.git
 homepage: https://github.com/thisisprabhat/templify.git
 
-version: 0.8.2
+version: 0.9.0
 
 environment:
   sdk: ^3.6.1
@@ -11,8 +11,9 @@ environment:
 dependencies:
   args: ^2.6.0
   collection: ^1.19.1
-  colored_log: ^1.2.0
+  colored_log: ^1.4.0
   intl: ^0.20.2
+  path: ^1.9.1
 
 dev_dependencies:
   lints: ^5.0.0
@@ -29,7 +30,6 @@ platforms:
   android:
   ios:
   macos:
-  web:
   windows:
 
 executables:

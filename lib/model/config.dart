@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:colored_log/colored_log.dart';
+import 'package:templify/create_template.dart';
 
 class Config {
   String? templatePath;
@@ -21,16 +22,9 @@ class Config {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'templatePath': templatePath,
-      'defaultModuleName': defaultModuleName,
-    };
-  }
-
   static Future<Config> fromFile() async {
-    final dir = Directory.systemTemp;
-    final file = File('${dir.path}/config.json');
+    final file = File(
+        '${Directory.systemTemp.path}${platformPathSaperator}templify_config.json');
     if (await file.exists()) {
       final content = await file.readAsString();
       final config = Config.fromJson(content);
@@ -53,7 +47,8 @@ class Config {
 
   static Future<void> reset() async {
     final dir = Directory.systemTemp;
-    final file = File('${dir.path}/templify_config.json');
+    final file =
+        File('${dir.path}${platformPathSaperator}templify_config.json');
 
     file.delete(recursive: true);
     ColoredLog.green('Config reset successfully');
@@ -61,7 +56,8 @@ class Config {
 
   static Future<void> save({String? defaultName, String? templatePath}) async {
     final dir = Directory.systemTemp;
-    final file = File('${dir.path}/templify_config.json');
+    final file =
+        File('${dir.path}${platformPathSaperator}templify_config.json');
     final config = await fromFile();
     final newConfig = config.copyWith(
       templatePath: templatePath,
@@ -73,6 +69,13 @@ class Config {
     ColoredLog('${config.templatePath}', name: 'Template Directory');
     ColoredLog('${config.defaultModuleName}', name: 'Default Module Name');
     print('');
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'templatePath': templatePath,
+      'defaultModuleName': defaultModuleName,
+    };
   }
 
   factory Config.fromMap(Map<String, dynamic> map) {

@@ -9,7 +9,7 @@ import 'package:templify/model/config.dart';
 
 import '../create_template.dart';
 
-final _version = '0.8.2';
+final _version = '0.9.0';
 
 class Commands {
   static handleCommands({
@@ -157,6 +157,7 @@ class Commands {
     required ArgParser configParser,
     bool version = false,
   }) {
+    Docs.printTitle();
     if (version) showVersion();
     Docs.printHelp(
       parser: parser,

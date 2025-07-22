@@ -61,6 +61,7 @@ void main(List<String> arguments) async {
 
     parser.addCommand('create', createParser);
 
+    //! It will display help guide for templify ~~~~~~~~~
     if (arguments.isEmpty) {
       Commands.help(
         parser: parser,
