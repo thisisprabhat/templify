@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:colored_log/colored_log.dart';
 import 'package:path/path.dart' as p;
+import 'package:templify/utils/string_extension.dart';
 
 import '../create_template.dart';
 
@@ -44,16 +45,26 @@ void printDirectoryTree(Directory dir, String prefix, bool isLast) {
   }
 }
 
-printInstructions(Directory templateDirectory) async {
+printInstructions({
+  required Directory templateDirectory,
+  required String defaultName,
+  required String moduleName,
+}) async {
   final instructionsPath =
       '${templateDirectory.path}${platformPathSaperator}instructions.md';
   final exists = await File(instructionsPath).exists();
   if (exists) {
     final instructionsFile = File(instructionsPath);
 
-    final instructions = await instructionsFile.readAsString();
+    String instructions = await instructionsFile.readAsString();
+    instructions = instructions.replaceCaseWith(
+      defaultName.toCamelCase,
+      moduleName.toCamelCase,
+    );
+
     print('\n\n\n');
     ColoredLog.cyan(
+      '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'
       '~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instrutions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
     );
     ColoredLog.markdown(instructions);

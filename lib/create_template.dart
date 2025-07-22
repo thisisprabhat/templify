@@ -80,7 +80,11 @@ class CreateTemplate {
       printDirectoryTree(destinationDirectory, '', true);
       print('\n\n');
       ColoredLog.green('Successfully Created', name: '✅');
-      await printInstructions(templateDirectory);
+      await printInstructions(
+        templateDirectory: templateDirectory,
+        defaultName: defaultName,
+        moduleName: moduleName,
+      );
     } catch (e) {
       ColoredLog.red(e, name: 'Error creating template');
     }
@@ -235,7 +239,7 @@ class CreateTemplate {
       ColoredLog.white('Select template index from below options');
       for (int i = 0; i < directories.length; i++) {
         ColoredLog.green(
-          directories[i].path.split(platformPathSaperator).last,
+          directories[i].path.split(platformPathSaperator).last.toTitleCase,
           name: i.toString(),
         );
       }

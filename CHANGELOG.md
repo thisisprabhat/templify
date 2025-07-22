@@ -1,3 +1,6 @@
+## 0.9.1
+- Improvements on instructions
+- Templates name
 ## 0.9.0
 
 - Added windows support

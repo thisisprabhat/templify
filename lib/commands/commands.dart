@@ -9,7 +9,7 @@ import 'package:templify/model/config.dart';
 
 import '../create_template.dart';
 
-final _version = '0.9.0';
+final _version = '0.9.1';
 
 class Commands {
   static handleCommands({
@@ -104,7 +104,8 @@ class Commands {
   static Future<String?> getTemplateDirectoryPath() async {
     final Config config = await Config.fromFile();
     String? templatePath = config.templatePath;
-    Directory dir = Directory('${Directory.current.path}/templates');
+    Directory dir =
+        Directory('${Directory.current.path}${platformPathSaperator}templates');
     if (templatePath == null) {
       ColoredLog.yellow(
         'No template folder found! Do you want to create template folder in the working directory (y/N):',
