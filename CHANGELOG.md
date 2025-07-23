@@ -1,3 +1,6 @@
+## 0.9.3
+- FileEntity copied name issue fixed
+
 ## 0.9.2
 - Added avoid copying and displaying `.git` directory
 

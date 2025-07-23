@@ -26,7 +26,7 @@ class CreateTemplate {
 
   String _moduleName = '';
   String? _defaultName;
-  String get defaultName => _defaultName ?? 'orange';
+  String get defaultName => _defaultName ?? 'employee';
   String _templateDirectoryPath =
       '${Directory.current.path}${platformPathSaperator}templates';
   String _destinationDirectoryPath = '';
@@ -200,7 +200,7 @@ class CreateTemplate {
           String fileName = entity.uri.pathSegments.last;
           if (fileName.containsAvoidableFiles) continue;
 
-          fileName = fileName.replaceCaseWith(
+          fileName = fileName.replaceAll(
             defaultName.toSnakeCase,
             moduleName.toSnakeCase,
           );
@@ -235,11 +235,18 @@ class CreateTemplate {
       List<Directory> directories = [];
       await for (FileSystemEntity entity in _templateRootDirectory.list(
           recursive: false, followLinks: false)) {
+        if (entity.path.containsAvoidableDirectory) continue;
         if (entity is Directory) {
-          if (entity.path.containsAvoidableDirectory) continue;
+          if (entity.path
+              .split(platformPathSaperator)
+              .last
+              .containsAvoidableDirectory) {
+            continue;
+          }
           directories.add(entity);
         }
       }
+      ColoredLog.red(directories, name: 'Directories');
 
       print('\n');
       ColoredLog.white('Select template index from below options');
