@@ -157,8 +157,8 @@ class CreateTemplate {
   }) async {
     String fileContents = await file.readAsString();
     fileContents = fileContents.replaceCaseWith(
-      defaultName.toCamelCase,
-      moduleName.toCamelCase,
+      defaultName.toSnakeCase,
+      moduleName.toSnakeCase,
     );
 
     final newFile = File(newPath);

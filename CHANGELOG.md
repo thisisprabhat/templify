@@ -1,3 +1,6 @@
+## 0.9.5
+- Fixed bugs related renaming contents
+
 ## 0.9.4
 - Camel Case to snake case conversion fixed
 

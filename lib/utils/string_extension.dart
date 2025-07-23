@@ -303,8 +303,18 @@ extension StringExtensions on String {
     );
 
     fileContents = fileContents.replaceAll(
+      oldValue.toSmallCaseText,
+      newValue.toSmallCaseText,
+    );
+
+    fileContents = fileContents.replaceAll(
       oldValue.toTitleCase,
       newValue.toTitleCase,
+    );
+
+    fileContents = fileContents.replaceAll(
+      oldValue.toPascalCase,
+      newValue.toPascalCase,
     );
 
     fileContents = fileContents.replaceAll(
