@@ -1,3 +1,6 @@
+## 0.9.4
+- Camel Case to snake case conversion fixed
+
 ## 0.9.3
 - FileEntity copied name issue fixed
 

@@ -189,7 +189,8 @@ class CreateTemplate {
         }
         if (entity is Directory) {
           String directoryName = entity.path.split(platformPathSaperator).last;
-          if (entity.path.containsAvoidableDirectory) continue;
+          if (directoryName.containsAvoidableDirectory) continue;
+          directoryName = directoryName.toSnakeCase;
           String newPath =
               '${destination.path}$platformPathSaperator$directoryName';
           ColoredLog.yellow(entity.path, name: 'New Directory');

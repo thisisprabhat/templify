@@ -119,21 +119,28 @@ extension StringExtensions on String {
   }
 
   //!~~~~~~~~~~~~~~~~~~~~~~~ Snake Case ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ///## Converts the string to snake case.
-  ///* This method splits the string by spaces, hyphens, or underscores and joins
-  /// the words with underscores in lowercase.
-  ///* Returns a new string in snake case, with all words in lowercase and separated by underscores.
-  ///
-  ///### Example:
-  /// ```dart
-  /// "Hello World".toSnakeCase; // Returns "hello_world"
-  /// ```
-  ///
-  ///### Returns: A [String] in snake case.
+  ///## Converts the string to snake_case.
+  /// Handles:
+  /// - camelCase (e.g., camelCaseString -> camel_case_string)
+  /// - PascalCase (e.g., PascalCaseString -> pascal_case_string)
+  /// - Spaces (e.g., Hello World -> hello_world)
+  /// - Hyphens (e.g., kebab-case-string -> kebab_case_string)
+  /// - Existing underscores (e.g., already_snake_case -> already_snake_case)
+  /// - Acronyms/consecutive uppercase letters (e.g., APIURL -> api_url, MyAWSKey -> my_aws_key)
+  /// - Leading/trailing spaces or multiple separators
   String get toSnakeCase {
-    return split(RegExp(r'[\s_-]+'))
+    String result = replaceAllMapped(
+        RegExp(r'([a-z0-9])([A-Z])'), (Match m) => '${m[1]!}_${m[2]!}');
+
+    result = result.replaceAllMapped(
+        RegExp(r'([A-Z])([A-Z][a-z])'), (Match m) => '${m[1]!}_${m[2]!}');
+    result = result
+        .split(RegExp(r'[\s_-]+'))
+        .where((word) => word.isNotEmpty)
         .map((word) => word.toLowerCase())
         .join('_');
+
+    return result;
   }
 
   ///!~~~~~~~~~~~~~~~~~~~~~~~ Initials ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

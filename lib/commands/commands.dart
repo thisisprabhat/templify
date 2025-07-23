@@ -9,7 +9,7 @@ import 'package:templify/model/config.dart';
 
 import '../create_template.dart';
 
-final _version = '0.9.3';
+final _version = '0.9.4';
 
 class Commands {
   static handleCommands({
