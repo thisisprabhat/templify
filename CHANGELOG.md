@@ -1,6 +1,10 @@
+## 0.9.2
+- Added avoid copying and displaying `.git` directory
+
 ## 0.9.1
 - Improvements on instructions
 - Templates name
+
 ## 0.9.0
 
 - Added windows support

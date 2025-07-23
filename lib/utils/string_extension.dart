@@ -327,4 +327,9 @@ extension StringExtensions on String {
     final avoidableFiles = ['name.txt', 'instructions.md', 'config.yaml'];
     return avoidableFiles.contains(this);
   }
+
+  bool get containsAvoidableDirectory {
+    final avoidableDirectory = ['.git', '.dart_tools', 'node_modules'];
+    return avoidableDirectory.contains(this);
+  }
 }

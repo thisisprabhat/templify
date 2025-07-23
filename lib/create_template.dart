@@ -189,6 +189,7 @@ class CreateTemplate {
         }
         if (entity is Directory) {
           String directoryName = entity.path.split(platformPathSaperator).last;
+          if (entity.path.containsAvoidableDirectory) continue;
           String newPath =
               '${destination.path}$platformPathSaperator$directoryName';
           ColoredLog.yellow(entity.path, name: 'New Directory');
@@ -211,6 +212,7 @@ class CreateTemplate {
       }
     } catch (e) {
       ColoredLog.red(e, name: 'Copy Directory Failed');
+      exit(0);
     }
   }
 
@@ -233,8 +235,12 @@ class CreateTemplate {
       List<Directory> directories = [];
       await for (FileSystemEntity entity in _templateRootDirectory.list(
           recursive: false, followLinks: false)) {
-        if (entity is Directory) directories.add(entity);
+        if (entity is Directory) {
+          if (entity.path.containsAvoidableDirectory) continue;
+          directories.add(entity);
+        }
       }
+
       print('\n');
       ColoredLog.white('Select template index from below options');
       for (int i = 0; i < directories.length; i++) {
